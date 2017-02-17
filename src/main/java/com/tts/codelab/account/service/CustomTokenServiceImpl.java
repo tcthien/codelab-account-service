@@ -1,0 +1,108 @@
+package com.tts.codelab.account.service;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.FixedAuthoritiesExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+@Service
+public class CustomTokenServiceImpl implements ResourceServerTokenServices {
+
+    protected static final Log logger = LogFactory.getLog(CustomTokenServiceImpl.class);
+    
+    private static final String[] PRINCIPAL_KEYS = new String[] { "user", "username",
+            "userid", "user_id", "login", "id", "name" };
+    
+    @Autowired
+    private ResourceServerProperties sso;
+    
+    @Autowired
+    private OAuth2RestOperations restTemplate;
+
+    private AuthoritiesExtractor authoritiesExtractor = new FixedAuthoritiesExtractor();
+    
+    @Override
+    public OAuth2Authentication loadAuthentication(String accessToken)
+            throws AuthenticationException, InvalidTokenException {
+        Map<String, Object> map = getUserInfo(accessToken);
+        if (map.containsKey("error")) {
+            logger.debug("userinfo returned error: " + map.get("error"));
+            throw new InvalidTokenException(accessToken);
+        }
+        return extractAuthentication(map);
+    }
+
+    private OAuth2Authentication extractAuthentication(Map<String, Object> map) {
+        Object principal = getPrincipal(map);
+        OAuth2Request request = getRequest(map);
+        List<GrantedAuthority> authorities = this.authoritiesExtractor
+                .extractAuthorities(map);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                principal, "N/A", authorities);
+        token.setDetails(map);
+        return new OAuth2Authentication(request, token);
+    }
+    
+    @SuppressWarnings({ "unchecked" })
+    private OAuth2Request getRequest(Map<String, Object> map) {
+        Map<String, Object> request = (Map<String, Object>) map.get("oauth2Request");
+
+        String clientId = (String) request.get("clientId");
+        Set<String> scope = new HashSet<>(request.containsKey("scope") ?
+                (Collection<String>) request.get("scope") : Collections.<String>emptySet());
+
+        return new OAuth2Request(null, clientId, null, true, new HashSet<>(scope),
+                null, null, null, null);
+    }
+    
+    private Object getPrincipal(Map<String, Object> map) {
+        for (String key : PRINCIPAL_KEYS) {
+            if (map.containsKey(key)) {
+                return map.get(key);
+            }
+        }
+        return "unknown";
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getUserInfo(String accessToken) {
+        logger.debug("Getting user info from" + sso.getUserInfoUri());
+        
+        Assert.notNull(restTemplate, "OAuth2RestOperations instance doesn't found");
+        
+        OAuth2AccessToken existedToken = restTemplate.getOAuth2ClientContext().getAccessToken();
+        if (existedToken == null || !existedToken.getValue().equals(accessToken)) {
+            DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(accessToken);
+            token.setTokenType(DefaultOAuth2AccessToken.BEARER_TYPE);
+            restTemplate.getOAuth2ClientContext().setAccessToken(token);
+        }
+        
+        return restTemplate.getForEntity(sso.getUserInfoUri(), Map.class).getBody();
+    }
+
+    @Override
+    public OAuth2AccessToken readAccessToken(String accessToken) {
+        throw new UnsupportedOperationException("Unsupported for readAccessToken.");
+    }
+}
