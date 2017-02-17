@@ -1,0 +1,15 @@
+version: '2'
+services:
+  codelab-account-mongodb:
+    environment:
+      CODELAB_USER: $CODELAB_USER
+      CODELAB_PASS: $CODELAB_PASS
+      INIT_DUMP: data.js
+    build: mongodb
+    ports:
+      - 20182:27017
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
