@@ -1,6 +1,5 @@
 package com.tts.codelab.account;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,9 +17,6 @@ import org.springframework.security.oauth2.client.token.grant.client.ClientCrede
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
-
-import com.tts.codelab.account.service.CustomTokenServiceImpl;
 
 import feign.RequestInterceptor;
 
@@ -34,32 +30,8 @@ import feign.RequestInterceptor;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class CodelabAccountServiceApplication extends ResourceServerConfigurerAdapter {
 
-    @Autowired
-    private CustomTokenServiceImpl tokenService;
-
     public static void main(String[] args) {
         SpringApplication.run(CodelabAccountServiceApplication.class, args);
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "security.oauth2.client")
-    public ClientCredentialsResourceDetails clientCredentialsResourceDetails() {
-        return new ClientCredentialsResourceDetails();
-    }
-    
-    @Bean
-    public RequestInterceptor oauth2FeignRequestInterceptor() {
-        return new OAuth2FeignRequestInterceptor(new DefaultOAuth2ClientContext(), clientCredentialsResourceDetails());
-    }
-    
-    @Bean
-    public OAuth2RestTemplate oauth2RestTemplateClientDetail() {
-        return new OAuth2RestTemplate(clientCredentialsResourceDetails());
-    }
-    
-    @Bean
-    public ResourceServerTokenServices tokenService() {
-        return tokenService;
     }
     
     @Override
@@ -70,5 +42,21 @@ public class CodelabAccountServiceApplication extends ResourceServerConfigurerAd
                 .antMatchers("/").permitAll()
                 .anyRequest().authenticated();
         // @formatter:on
+    }
+    
+    @Bean
+    @ConfigurationProperties(prefix = "security.oauth2.client")
+    public ClientCredentialsResourceDetails clientCredentialsResourceDetails() {
+        return new ClientCredentialsResourceDetails();
+    }
+
+    @Bean
+    public RequestInterceptor oauth2FeignRequestInterceptor(){
+        return new OAuth2FeignRequestInterceptor(new DefaultOAuth2ClientContext(), clientCredentialsResourceDetails());
+    }
+
+    @Bean
+    public OAuth2RestTemplate clientCredentialsRestTemplate() {
+        return new OAuth2RestTemplate(clientCredentialsResourceDetails());
     }
 }
