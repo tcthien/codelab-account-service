@@ -21,7 +21,7 @@ public interface AccountService {
 	 * @param user
 	 * @return created account
 	 */
-	Account create(User user);
+	Account create(Account user);
 
 	/**
 	 * Validates and applies incoming account updates

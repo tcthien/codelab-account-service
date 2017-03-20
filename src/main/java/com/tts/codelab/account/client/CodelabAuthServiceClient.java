@@ -12,4 +12,7 @@ public interface CodelabAuthServiceClient {
 
     @RequestMapping(path = "/uaa/users", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     void createUser(User user);
+
+    @RequestMapping(path = "/uaa/users", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    void updateUser(User user);
 }

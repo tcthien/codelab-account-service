@@ -39,7 +39,7 @@ public class AccountController {
 	}
 
 	@RequestMapping(path = "/", method = RequestMethod.POST)
-	public Account createNewAccount(@Valid @RequestBody User user) {
-		return accountService.create(user);
+	public Account createNewAccount(@Valid @RequestBody Account account) {
+		return accountService.create(account);
 	}
 }

@@ -31,20 +31,22 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Account create(User user) {
+	public Account create(Account account) {
 
-		Account existing = repository.findByName(user.getUsername());
-		Assert.isNull(existing, "account already exists: " + user.getUsername());
+		Account existing = repository.findByName(account.getUserName());
+		Assert.isNull(existing, "account already exists: " + account.getUserName());
 
+		// Extract user information from account & create new user
+		User user = new User();
+		user.setEmail(account.getEmail());
+		user.setFullName(account.getFullName());
+		user.setPassword("123456");
+		user.setUsername(account.getUserName());
 		authClient.createUser(user);
-
-		Account account = new Account();
-		account.setName(user.getUsername());
-		account.setLastSeen(new Date());
 
 		repository.save(account);
 
-		log.info("new account has been created: " + account.getName());
+		log.info("new account has been created: " + account.getUserName());
 
 		return account;
 	}
@@ -55,6 +57,14 @@ public class AccountServiceImpl implements AccountService {
 		Account account = repository.findByName(name);
 		Assert.notNull(account, "can't find account with name " + name);
 
+        User user = new User();
+        user.setEmail(update.getEmail());
+        user.setUsername(update.getUserName());
+        user.setFullName(update.getFullName());
+        authClient.updateUser(user);
+
+		account.setFullName(update.getFullName());
+		account.setProject(update.getProject());
 		account.setNote(update.getNote());
 		account.setLastSeen(new Date());
 		repository.save(account);
