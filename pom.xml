@@ -105,7 +105,7 @@
 		</repository>
 		<repository>
 			<id>spring-milestones</id>
-			<name>Spring Milestones</userNnameame>
+			<name>Spring Milestones</name>
 			<url>https://repo.spring.io/milestone</url>
 			<snapshots>
 				<enabled>false</enabled>
