@@ -1,6 +1,9 @@
 FROM mongo:3
 MAINTAINER Thien Tran <thientran1986@gmail.com>
 
+ENV http_proxy 'http://10.10.10.10:8080'
+ENV https_proxy 'http://10.10.10.10:8080'
+
 ADD env /env.sh
 ADD init.sh /init.sh
 ADD ./dump /
@@ -8,6 +11,7 @@ ADD ./dump /
 RUN \
  chmod +x /init.sh && \
  apt-get update && apt-get dist-upgrade -y && \
+ apt-get install apt-transport-https ca-certificates && \
  apt-get install psmisc -y -q && \
  apt-get autoremove -y && apt-get clean && \
  rm -rf /var/cache/* && rm -rf /var/lib/apt/lists/*
