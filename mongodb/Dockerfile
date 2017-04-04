@@ -1,10 +1,6 @@
 FROM mongo:3
 MAINTAINER Thien Tran <thientran1986@gmail.com>
 
-ENV http_proxy 'http://10.10.10.10:8080'
-ENV https_proxy 'http://10.10.10.10:8080'
-
-ADD env /env.sh
 ADD init.sh /init.sh
 ADD ./dump /
 
