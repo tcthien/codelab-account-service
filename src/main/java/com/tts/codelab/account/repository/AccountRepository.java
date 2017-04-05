@@ -8,5 +8,5 @@ import com.tts.codelab.account.domain.Account;
 @Repository
 public interface AccountRepository extends CrudRepository<Account, String> {
 
-	Account findByName(String name);
+	Account findByUserName(String name);
 }

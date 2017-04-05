@@ -33,7 +33,7 @@ public class CodelabAccountServiceApplication extends ResourceServerConfigurerAd
     public static void main(String[] args) {
         SpringApplication.run(CodelabAccountServiceApplication.class, args);
     }
-    
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
@@ -43,7 +43,7 @@ public class CodelabAccountServiceApplication extends ResourceServerConfigurerAd
                 .anyRequest().authenticated();
         // @formatter:on
     }
-    
+
     @Bean
     @ConfigurationProperties(prefix = "security.oauth2.client")
     public ClientCredentialsResourceDetails clientCredentialsResourceDetails() {
@@ -51,7 +51,7 @@ public class CodelabAccountServiceApplication extends ResourceServerConfigurerAd
     }
 
     @Bean
-    public RequestInterceptor oauth2FeignRequestInterceptor(){
+    public RequestInterceptor oauth2FeignRequestInterceptor() {
         return new OAuth2FeignRequestInterceptor(new DefaultOAuth2ClientContext(), clientCredentialsResourceDetails());
     }
 

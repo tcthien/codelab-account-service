@@ -14,45 +14,45 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Account {
 
-	@Id
-	private String userName;
+    @Id
+    private String userName;
 
-	@NotNull
+    @NotNull
     private String fullName;
 
     @NotNull
-	private String email;
+    private String email;
 
     private String project;
 
-	private Date lastSeen;
+    private Date lastSeen;
 
-	@Length(min = 0, max = 20_000)
-	private String note;
+    @Length(min = 0, max = 20_000)
+    private String note;
 
-	public String getUserName() {
-		return userName;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public Date getLastSeen() {
-		return lastSeen;
-	}
+    public Date getLastSeen() {
+        return lastSeen;
+    }
 
-	public void setLastSeen(Date lastSeen) {
-		this.lastSeen = lastSeen;
-	}
+    public void setLastSeen(Date lastSeen) {
+        this.lastSeen = lastSeen;
+    }
 
-	public String getNote() {
-		return note;
-	}
+    public String getNote() {
+        return note;
+    }
 
-	public void setNote(String note) {
-		this.note = note;
-	}
+    public void setNote(String note) {
+        this.note = note;
+    }
 
     public String getFullName() {
         return fullName;

@@ -16,46 +16,46 @@ import com.tts.codelab.account.repository.AccountRepository;
 @Service
 public class AccountServiceImpl implements AccountService {
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
-	@Autowired
-	private CodelabAuthServiceClient authClient;
+    @Autowired
+    private CodelabAuthServiceClient authClient;
 
-	@Autowired
-	private AccountRepository repository;
+    @Autowired
+    private AccountRepository repository;
 
-	@Override
-	public Account findByName(String accountName) {
-		Assert.hasLength(accountName);
-		return repository.findByName(accountName);
-	}
+    @Override
+    public Account findByName(String accountName) {
+        Assert.hasLength(accountName);
+        return repository.findByUserName(accountName);
+    }
 
-	@Override
-	public Account create(Account account) {
+    @Override
+    public Account create(Account account) {
 
-		Account existing = repository.findByName(account.getUserName());
-		Assert.isNull(existing, "account already exists: " + account.getUserName());
+        Account existing = repository.findByUserName(account.getUserName());
+        Assert.isNull(existing, "account already exists: " + account.getUserName());
 
-		// Extract user information from account & create new user
-		User user = new User();
-		user.setEmail(account.getEmail());
-		user.setFullName(account.getFullName());
-		user.setPassword("123456");
-		user.setUsername(account.getUserName());
-		authClient.createUser(user);
+        // Extract user information from account & create new user
+        User user = new User();
+        user.setEmail(account.getEmail());
+        user.setFullName(account.getFullName());
+        user.setPassword("123456");
+        user.setUsername(account.getUserName());
+        authClient.createUser(user);
 
-		repository.save(account);
+        repository.save(account);
 
-		log.info("new account has been created: " + account.getUserName());
+        log.info("new account has been created: " + account.getUserName());
 
-		return account;
-	}
+        return account;
+    }
 
-	@Override
-	public void saveChanges(String name, Account update) {
+    @Override
+    public void saveChanges(String name, Account update) {
 
-		Account account = repository.findByName(name);
-		Assert.notNull(account, "can't find account with name " + name);
+        Account account = repository.findByUserName(name);
+        Assert.notNull(account, "can't find account with name " + name);
 
         User user = new User();
         user.setEmail(update.getEmail());
@@ -63,12 +63,12 @@ public class AccountServiceImpl implements AccountService {
         user.setFullName(update.getFullName());
         authClient.updateUser(user);
 
-		account.setFullName(update.getFullName());
-		account.setProject(update.getProject());
-		account.setNote(update.getNote());
-		account.setLastSeen(new Date());
-		repository.save(account);
+        account.setFullName(update.getFullName());
+        account.setProject(update.getProject());
+        account.setNote(update.getNote());
+        account.setLastSeen(new Date());
+        repository.save(account);
 
-		log.debug("account {} changes has been saved", name);
-	}
+        log.debug("account {} changes has been saved", name);
+    }
 }
