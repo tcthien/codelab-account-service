@@ -1,7 +1,6 @@
 package com.tts.codelab.account.service;
 
 import com.tts.codelab.account.domain.Account;
-import com.tts.codelab.account.domain.User;
 
 public interface AccountService {
 
