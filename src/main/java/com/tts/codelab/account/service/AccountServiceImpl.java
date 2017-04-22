@@ -25,7 +25,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository repository;
 
     @Override
-    public Account findByName(String accountName) {
+    public Account findByUserName(String accountName) {
         Assert.hasLength(accountName);
         return repository.findByUserName(accountName);
     }

@@ -10,7 +10,7 @@ public interface AccountService {
      * @param accountName
      * @return found account
      */
-    Account findByName(String accountName);
+    Account findByUserName(String accountName);
 
     /**
      * Checks if account with the same name already exists
